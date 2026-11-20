@@ -24,5 +24,5 @@ backend/
     routes/        one file per area (products.py, auth.py, orders.py ...): HTTP only
     (more folders come with the tickets: models, services, domain, db)
   tests/           one test file per area
-docs/              decisions and notes of the team
+docs/              architecture.md (why the code is organised this way), decisions.md
 ```
