@@ -8,3 +8,6 @@ dist/
 .env
 test-results/
 playwright-report/
+
+# editor settings (personal)
+.vscode/
