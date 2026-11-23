@@ -8,11 +8,13 @@ from sqlmodel import Session, select
 from app.db import engine
 from app.models import Product
 
-SAMPLE_PRODUCTS = [
-    Product(name="Blue T-shirt", price=Decimal("12.50"), stock=10),
-    Product(name="Coffee mug", price=Decimal("7.00"), stock=0),
-    Product(name="Notebook", price=Decimal("3.25"), stock=42),
-]
+
+def sample_products() -> list[Product]:
+    return [
+        Product(name="Blue T-shirt", price=Decimal("12.50"), stock=10),
+        Product(name="Coffee mug", price=Decimal("7.00"), stock=0),
+        Product(name="Notebook", price=Decimal("3.25"), stock=42),
+    ]
 
 
 def seed() -> None:
@@ -20,9 +22,10 @@ def seed() -> None:
         if session.exec(select(Product)).first() is not None:
             print("product table already has data: nothing added")
             return
-        session.add_all(SAMPLE_PRODUCTS)
+        products = sample_products()
+        session.add_all(products)
         session.commit()
-        print(f"added {len(SAMPLE_PRODUCTS)} products")
+        print(f"added {len(products)} products")
 
 
 if __name__ == "__main__":
