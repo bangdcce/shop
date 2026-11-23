@@ -3,14 +3,18 @@
 from fastapi import FastAPI
 from sqlmodel import select
 from app.db import SessionDep
+from app.routes import products
 
 app = FastAPI(title="Shop API", version="0.1.0")
+app.include_router(products.router)
 
 
 @app.get("/health")
 def health(session: SessionDep):
     """Used by humans, tests, Docker and monitoring: is the API alive, and can it reach the database?"""
-    session.exec(select(1))  # cheapest possible question; if the database is down this raises -> 500
+    session.exec(
+        select(1)
+    )  # cheapest possible question; if the database is down this raises -> 500
     return {"status": "ok", "database": "ok"}
 
 
