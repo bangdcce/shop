@@ -1,16 +1,14 @@
-from pwdlib import PasswordHash
 from sqlmodel import select
 
 from app.db import SessionDep
 from app.models import User, UserIn, UserOut, Token
-from app.security import CurrentUser, create_token
+from app.security import CurrentUser, create_token, password_hash
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-password_hash = PasswordHash.recommended()
 
 
 @router.post("/register", status_code=201, response_model=UserOut)

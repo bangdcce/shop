@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     database_url: str
     secret_key: str
     token_minutes: int = 60
+    admin_email: str
+    admin_password: str
 
 
 settings = Settings()

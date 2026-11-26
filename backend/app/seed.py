@@ -6,7 +6,9 @@ from decimal import Decimal
 from sqlmodel import Session, select
 
 from app.db import engine
-from app.models import Product
+from app.models import Product, User
+from app.config import settings
+from app.security import password_hash
 
 
 def sample_products() -> list[Product]:
@@ -28,5 +30,22 @@ def seed() -> None:
         print(f"added {len(products)} products")
 
 
+def seed_admin() -> None:
+    with Session(engine) as session:
+        found = session.exec(select(User).where(User.email == settings.admin_email)).first()
+        if found is not None:
+            print("admin already exists: nothing added")
+            return
+        admin = User(
+            email=settings.admin_email,
+            hashed_password=password_hash.hash(settings.admin_password),
+            role="admin",
+        )
+        session.add(admin)
+        session.commit()
+        print(f"added admin {settings.admin_email}")
+
+
 if __name__ == "__main__":
     seed()
+    seed_admin()
