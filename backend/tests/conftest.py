@@ -27,5 +27,5 @@ def migrate_test_db():
 @pytest.fixture(autouse=True)
 def fresh_products():
     with engine.begin() as conn:
-        conn.execute(text("TRUNCATE product RESTART IDENTITY"))
+        conn.execute(text('TRUNCATE product, "user" RESTART IDENTITY'))  # ✅
     seed()
