@@ -3,7 +3,6 @@ Arrange (data) -> Act (call the API) -> Assert (check status AND body)."""
 
 from fastapi.testclient import TestClient
 from sqlmodel import Session, create_engine
-
 from app.db import get_session
 from app.main import app
 
@@ -19,7 +18,9 @@ def test_health_says_ok():
 def test_health_fails_when_database_is_down():
     # Arrange: give /health a session whose database address has nothing listening (port 1)
     # connect_timeout=1: on Windows a refused connection is retried for a long time; give up after 1 second
-    dead_engine = create_engine("postgresql+psycopg://x:x@127.0.0.1:1/x?connect_timeout=1")
+    dead_engine = create_engine(
+        "postgresql+psycopg://x:x@127.0.0.1:1/x?connect_timeout=1"
+    )
 
     def dead_session():
         with Session(dead_engine) as session:

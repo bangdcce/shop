@@ -3,10 +3,11 @@
 from fastapi import FastAPI
 from sqlmodel import select
 from app.db import SessionDep
-from app.routes import products
+from app.routes import auth, products
 
 app = FastAPI(title="Shop API", version="0.1.0")
 app.include_router(products.router)
+app.include_router(auth.router)
 
 
 @app.get("/health")
