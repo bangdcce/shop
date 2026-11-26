@@ -33,3 +33,9 @@ class UserOut(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class ProductIn(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    price: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
+    stock: int = Field(ge=0)

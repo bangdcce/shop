@@ -2,7 +2,9 @@ from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 from decimal import Decimal
 from app.db import SessionDep
-from app.models import Product
+from app.models import Product, ProductIn
+from app.security import AdminUser
+
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -34,4 +36,13 @@ def get_product_by_id(product_id: int, session: SessionDep):
     product = session.get(Product, product_id)
     if product is None:
         raise HTTPException(404, "Product not found")
+    return product
+
+
+@router.post("", status_code=201)
+def add_product(data: ProductIn, session: SessionDep, admin: AdminUser):
+    product = Product.model_validate(data)
+    session.add(product)
+    session.commit()
+    session.refresh(product)
     return product
