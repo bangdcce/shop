@@ -5,7 +5,6 @@ from app.db import SessionDep
 from app.models import Product, ProductIn
 from app.security import AdminUser
 
-
 router = APIRouter(prefix="/products", tags=["products"])
 
 

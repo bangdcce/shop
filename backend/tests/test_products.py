@@ -5,6 +5,7 @@ from sqlmodel import Session
 from app.db import engine
 from app.main import app
 from app.models import Product
+from app.seed import seed_admin
 import pytest
 
 client = TestClient(app)
@@ -103,3 +104,38 @@ def test_no_match_is_empty_list_not_404():  # SHOP-006 AC4
 
 def test_min_equals_max_is_allowed():  # SHOP-006 AC6
     assert names({"min_price": "7", "max_price": "7"}) == ["Coffee mug"]
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {
+            "name": "",
+            "price": "1.00",
+            "stock": 1,
+        },  # tên rỗng      → vi phạm min_length=1
+        {"name": "A", "price": "0", "stock": 1},  # giá 0         → vi phạm gt=0
+        {"name": "A", "price": "-1", "stock": 1},  # giá âm        → vi phạm gt=0
+        {
+            "name": "A",
+            "price": "1.999",
+            "stock": 1,
+        },  # 3 số lẻ       → vi phạm decimal_places=2
+        {"name": "A", "price": "1.00", "stock": -1},  # tồn kho âm    → vi phạm ge=0
+    ],
+)
+def test_bad_product_is_422(
+    body, admin_headers
+):  # dùng header ADMIN: để chắc 422 là do dữ liệu, không phải do quyền
+    r = client.post("/products", json=body, headers=admin_headers)
+    assert r.status_code == 422
+
+
+def test_boundary_values_are_ok(admin_headers):
+    body = {
+        "name": "A",
+        "price": "0.01",
+        "stock": 0,
+    }  # giá nhỏ nhất hợp lệ, tồn kho nhỏ nhất hợp lệ
+    r = client.post("/products", json=body, headers=admin_headers)
+    assert r.status_code == 201
