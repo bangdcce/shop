@@ -20,7 +20,8 @@ from fastapi.testclient import TestClient
 from app.config import settings
 from app.db import engine
 from app.main import app
-from app.seed import seed
+from app.seed import seed, seed_admin
+
 
 client = TestClient(app)
 
@@ -35,3 +36,25 @@ def fresh_products():
     with engine.begin() as conn:
         conn.execute(text('TRUNCATE product, "user" RESTART IDENTITY'))  # ✅
     seed()
+
+
+def login_headers(email: str, password: str) -> dict:
+    # hàm THƯỜNG (không có @pytest.fixture): bước 1c lẫn bước 2 đều cần "đăng nhập rồi gói header"
+    r = client.post("/auth/login", data={"username": email, "password": password})
+    return {"Authorization": f"Bearer {r.json()['access_token']}"}
+
+
+@pytest.fixture
+def customer_headers():
+    client.post(
+        "/auth/register", json={"email": "cus@example.com", "password": "cus-pass-123"}
+    )
+    return login_headers("cus@example.com", "cus-pass-123")
+    #   giá trị return này = cái test nhận được ở tham số customer_headers
+
+
+@pytest.fixture
+def admin_headers():
+    seed_admin()  # tạo admin trong shop_test (email, mật khẩu lấy từ .env qua settings)
+    return login_headers(settings.admin_email, settings.admin_password)
+    #   đăng nhập đúng tài khoản vừa seed → header admin
